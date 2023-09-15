@@ -1,0 +1,273 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>testOCV</title>
+<meta name="generator" content="MATLAB 23.2">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2023-09-15">
+<meta name="DC.source" content="testOCV.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+</head>
+<body>
+<div class="content">
+<pre class="codeinput">clc, clearvars, close <span class="string">all</span>
+<span class="comment">% Compute an open-circuit voltage as a function of SOC based on test data</span>
+
+load <span class="string">E2_OCV_P25.mat</span>; <span class="comment">% OCV Test Script data for a 25 degC test</span>
+
+whos
+
+<span class="comment">% Plot voltage from script 1</span>
+figure(1)
+plot(OCVData.script1.time/3600, OCVData.script1.voltage);
+title(<span class="string">'Volatage vs. Time for OCV Test Script #1'</span>)
+xlabel(<span class="string">'Time (hr)'</span>)
+ylabel(<span class="string">'Voltage (V)'</span>)
+grid <span class="string">on</span>
+
+<span class="comment">% Find coulombic efficiency at 25 degC (tot dis amp hour/tot chg amp hour)</span>
+totDisAh = OCVData.script1.disAh(end) + OCVData.script2.disAh(end) + <span class="keyword">...</span>
+           OCVData.script3.disAh(end) + OCVData.script4.disAh(end);
+
+totChgAh = OCVData.script1.chgAh(end) + OCVData.script2.chgAh(end) + <span class="keyword">...</span>
+           OCVData.script3.chgAh(end) + OCVData.script4.chgAh(end);
+
+eta25 = totDisAh/totChgAh
+
+<span class="comment">% Find total capacity (total dis/chg amp hour during stript 1 &amp; 2)</span>
+Q25 = OCVData.script1.disAh(end) + OCVData.script2.disAh(end) - <span class="keyword">...</span>
+      eta25*OCVData.script1.chgAh(end) - eta25*OCVData.script2.chgAh(end)
+
+<span class="comment">% Compute approx.OCV relationship at 25degC</span>
+SOC = 0:0.005:1;
+
+<span class="comment">% R0 estimate</span>
+indD = find(OCVData.script1.step == 2); <span class="comment">% slow discharge</span>
+IR1Da = OCVData.script1.voltage(indD(1) - 1) - OCVData.script1.voltage(indD(1));
+IR2Da = OCVData.script1.voltage(indD(end) + 1) - OCVData.script1.voltage(indD(end));
+
+indC = find(OCVData.script3.step == 2); <span class="comment">% slow charge</span>
+IR1Ca = OCVData.script3.voltage(indC(1)) - OCVData.script3.voltage(indC(1) - 1);
+IR2Ca = OCVData.script3.voltage(indC(end)) - OCVData.script3.voltage(indC(end) + 1);
+
+IR1D = min(IR1Da, 2*IR2Ca);
+IR2D = min(IR2Da, 2*IR1Ca);
+IR1C = min(IR1Ca, 2*IR2Da);
+IR2C = min(IR2Ca, 2*IR1Da);
+
+blend = (0:length(indD)-1)/(length(indD)-1);
+IRblend = IR1D + (IR2D - IR1D)*blend(:);
+disV = OCVData.script1.voltage(indD) + IRblend;
+disZ = 1 - OCVData.script1.disAh(indD)/Q25;
+disZ = disZ + (1 - disZ(1));
+
+blend = (0:length(indC)-1)/(length(indC)-1);
+IRblend = IR1C + (IR2C - IR1C)*blend(:);
+chgV = OCVData.script3.voltage(indC) - IRblend;
+chgZ = OCVData.script3.chgAh(indC)/Q25;
+chgZ = chgZ - chgZ(1);
+
+deltaV50 = interp1(chgZ, chgV, 0.5) - interp1(disZ, disV, 0.5);
+ind = find(chgZ &lt; 0.5);
+vChg = chgV(ind) - chgZ(ind)*deltaV50;
+zChg = chgZ(ind);
+ind = find(disZ &gt; 0.5);
+vDis = flipud(disV(ind) + (1 - disZ(ind))*deltaV50);
+zDis = flipud(disZ(ind));
+rawOCV = interp1([zChg; zDis], [vChg; vDis], SOC, <span class="string">"linear"</span>, <span class="string">"extrap"</span>);
+
+figure(2)
+plot(SOC, rawOCV)
+xlabel(<span class="string">'State of Charge'</span>)
+ylabel(<span class="string">'Voltage (V)'</span>)
+grid <span class="string">on</span>
+title(<span class="string">'Approximate Open-Circuit Voltage as a function of SOC at 25^oC'</span>)
+
+
+
+<span class="comment">% test rawOCV</span>
+testSOC = 0.25
+OCV = interp1(SOC, rawOCV, testSOC)
+</pre>
+<pre class="codeoutput">  Name         Size              Bytes  Class     Attributes
+
+  OCVData      1x1             2039424  struct              
+
+
+eta25 =
+
+    0.9834
+
+
+Q25 =
+
+    5.2127
+
+
+testSOC =
+
+    0.2500
+
+
+OCV =
+
+    3.8201
+
+</pre>
+<img vspace="5" hspace="5" src="testOCV_01.png" alt=""> <img vspace="5" hspace="5" src="testOCV_02.png" alt=""> <p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2023b</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+clc, clearvars, close all
+% Compute an open-circuit voltage as a function of SOC based on test data
+
+load E2_OCV_P25.mat; % OCV Test Script data for a 25 degC test
+
+whos
+
+% Plot voltage from script 1
+figure(1)
+plot(OCVData.script1.time/3600, OCVData.script1.voltage);
+title('Volatage vs. Time for OCV Test Script #1')
+xlabel('Time (hr)')
+ylabel('Voltage (V)')
+grid on
+
+% Find coulombic efficiency at 25 degC (tot dis amp hour/tot chg amp hour)
+totDisAh = OCVData.script1.disAh(end) + OCVData.script2.disAh(end) + ...
+           OCVData.script3.disAh(end) + OCVData.script4.disAh(end);
+
+totChgAh = OCVData.script1.chgAh(end) + OCVData.script2.chgAh(end) + ...
+           OCVData.script3.chgAh(end) + OCVData.script4.chgAh(end);
+
+eta25 = totDisAh/totChgAh
+
+% Find total capacity (total dis/chg amp hour during stript 1 & 2)
+Q25 = OCVData.script1.disAh(end) + OCVData.script2.disAh(end) - ...
+      eta25*OCVData.script1.chgAh(end) - eta25*OCVData.script2.chgAh(end)
+
+% Compute approx.OCV relationship at 25degC
+SOC = 0:0.005:1;
+
+% R0 estimate
+indD = find(OCVData.script1.step == 2); % slow discharge
+IR1Da = OCVData.script1.voltage(indD(1) - 1) - OCVData.script1.voltage(indD(1));
+IR2Da = OCVData.script1.voltage(indD(end) + 1) - OCVData.script1.voltage(indD(end));
+
+indC = find(OCVData.script3.step == 2); % slow charge
+IR1Ca = OCVData.script3.voltage(indC(1)) - OCVData.script3.voltage(indC(1) - 1);
+IR2Ca = OCVData.script3.voltage(indC(end)) - OCVData.script3.voltage(indC(end) + 1);
+
+IR1D = min(IR1Da, 2*IR2Ca);
+IR2D = min(IR2Da, 2*IR1Ca);
+IR1C = min(IR1Ca, 2*IR2Da);
+IR2C = min(IR2Ca, 2*IR1Da);
+
+blend = (0:length(indD)-1)/(length(indD)-1);
+IRblend = IR1D + (IR2D - IR1D)*blend(:);
+disV = OCVData.script1.voltage(indD) + IRblend;
+disZ = 1 - OCVData.script1.disAh(indD)/Q25;
+disZ = disZ + (1 - disZ(1));
+
+blend = (0:length(indC)-1)/(length(indC)-1);
+IRblend = IR1C + (IR2C - IR1C)*blend(:);
+chgV = OCVData.script3.voltage(indC) - IRblend;
+chgZ = OCVData.script3.chgAh(indC)/Q25;
+chgZ = chgZ - chgZ(1);
+
+deltaV50 = interp1(chgZ, chgV, 0.5) - interp1(disZ, disV, 0.5);
+ind = find(chgZ < 0.5);
+vChg = chgV(ind) - chgZ(ind)*deltaV50;
+zChg = chgZ(ind);
+ind = find(disZ > 0.5);
+vDis = flipud(disV(ind) + (1 - disZ(ind))*deltaV50);
+zDis = flipud(disZ(ind));
+rawOCV = interp1([zChg; zDis], [vChg; vDis], SOC, "linear", "extrap");
+
+figure(2)
+plot(SOC, rawOCV)
+xlabel('State of Charge')
+ylabel('Voltage (V)')
+grid on
+title('Approximate Open-Circuit Voltage as a function of SOC at 25^oC')
+
+
+
+% test rawOCV 
+testSOC = 0.25
+OCV = interp1(SOC, rawOCV, testSOC)
+
+##### SOURCE END #####
+-->
+</body>
+</html>
